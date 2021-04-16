@@ -13,8 +13,14 @@
 
 // const styles = StyleSheet.create({});
 import React, {Component} from 'react';
-import {Text, StyleSheet, View, TouchableOpacity} from 'react-native';
-import fetchRecipes from '../../../utils/mkalpanaApi/api';
+import {
+  Text,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
+import {fetchRecipes} from '../../../utils/mkalpanaApi/api';
 import {addRecipe, removeFromCalendar} from '../../../redux/actions';
 import {connect} from 'react-redux';
 import ShoppingList from '../mkalpana/ShoppingList';
@@ -23,7 +29,7 @@ import FoodSearch from '../mkalpana/FoodSearch';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import Home from '../Home';
 
-class HomeTest extends Component {
+class HomeKalpana extends Component {
   constructor(props) {
     super(props);
 
@@ -107,63 +113,66 @@ class HomeTest extends Component {
     const {calendar, selectRecipe, remove} = this.props;
     const mealOrder = ['breakfast', 'lunch', 'dinner'];
     return (
-      <View style={styles.container}>
-        <Text>Meal Planner</Text>
+      <ScrollView>
+        <View style={styles.container}>
+          <Text>Meal Planner</Text>
 
-        <TouchableOpacity style={styles.btn}>
-          <Text>ShoppingList</Text>
-        </TouchableOpacity>
-        <View style={styles.tabs}>
-          {mealOrder.map(mealType => (
-            <Text>{mealType}</Text>
-          ))}
-        </View>
-        <View style={styles.calendar}>
-          <View style={styles.days}>
-            {calendar.map(({day, meals}) => (
-              <View key={day}>
-                {mealOrder.map(meal => (
-                  <View>
-                    {meals[meal] ? (
-                      <View>
-                        <Image source={{uri: meals[meal.image]}} />
-                        <Text>{meals[meal].label}</Text>
-                        <TouchableOpacity>
-                          <Text>Clear</Text>
-                        </TouchableOpacity>
-                      </View>
-                    ) : (
-                      <View>
-                        <TouchableOpacity
-                          onPress={() => this.openFoodModal({meal, day})}>
-                          <Icon name="calendar-alt" size={20} />
-                        </TouchableOpacity>
-                      </View>
-                    )}
-                  </View>
-                ))}
-              </View>
+          <TouchableOpacity style={styles.btn}>
+            <Text>ShoppingList</Text>
+          </TouchableOpacity>
+          <View style={styles.tabs}>
+            {mealOrder.map(mealType => (
+              <Text key={mealType}>{mealType}</Text>
             ))}
           </View>
+          <View style={styles.calendar}>
+            <View style={styles.days}>
+              {calendar.map(({day, meals}) => (
+                <View key={day}>
+                  {mealOrder.map(meal => (
+                    <View key={meal}>
+                      {meals[meal] ? (
+                        <View>
+                          <Image source={{uri: meals[meal.image]}} />
+                          <Text>{meals[meal].label}</Text>
+                          <TouchableOpacity>
+                            <Text>Clear</Text>
+                          </TouchableOpacity>
+                        </View>
+                      ) : (
+                        <View>
+                          <TouchableOpacity
+                            style={styles.tabs}
+                            onPress={() => this.openFoodModal({meal, day})}>
+                            <Icon name="calendar" size={20} />
+                          </TouchableOpacity>
+                        </View>
+                      )}
+                    </View>
+                  ))}
+                </View>
+              ))}
+            </View>
+          </View>
+          <Modal isOpen={isFoodModalOpen}>
+            <FoodSearch
+              isLoading={loadingFood}
+              selectRecipe={selectRecipe}
+              searchFood={this.searchFood}
+              onInputChange={this.onInputChange}
+              food={food}
+              day={day}
+              meal={meal}
+              onClose={this.closeFoodModal}
+            />
+          </Modal>
+          <Modal
+            isOpen={isIngredientsModalOpen}
+            onClose={this.closeIngredientsModal}>
+            <ShoppingList list={this.generateShoppingList()} />
+          </Modal>
         </View>
-        <Modal isOpen={isFoodModalOpen}>
-          <FoodSearch
-            isLoading={loadingFood}
-            selectRecipe={selectRecipe}
-            searchFood={this.searchFood}
-            onInputChange={this.onInputChange}
-            food={food}
-            day={day}
-            meal={meal}
-            onClose={this.closeFoodModal}
-          />
-        </Modal>
-        <Modal
-          isOpen={isIngredientsModalOpen}
-          onClose={this.closeIngredientsModal}>
-          <ShoppingList list={this.generateShoppingList()} />
-        </Modal>
-      </View>
+      </ScrollView>
     );
   }
 }
@@ -212,4 +221,4 @@ const mapDispatchToProps = dispatch => ({
   remove: data => dispatch(removeFromCalendar(data)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomeTest);
+export default connect(mapStateToProps, mapDispatchToProps)(HomeKalpana);

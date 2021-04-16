@@ -284,7 +284,7 @@ export default class Survey extends Component {
   }
 
   handleHealth = name => {
-    setHealthPreferences(prevState => {
+    this.setState(prevState => {
       let value = prevState.healthPreferences[name]
         ? !prevState.state.healthPreferences[name]
         : true;
@@ -297,8 +297,9 @@ export default class Survey extends Component {
     });
   };
 
-  handleSelect = () => {
-    this.setState({[name]: parseInt(value, 10)});
+  handleSelect = e => {
+    const target = e.target;
+    this.setState({[target.name]: parseInt(target.value, 10)});
   };
 
   handleCalories = index => {
